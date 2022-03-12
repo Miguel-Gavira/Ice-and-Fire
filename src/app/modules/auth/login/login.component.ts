@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { filter, tap } from 'rxjs';
+import { filter, Subscription, tap } from 'rxjs';
 import { JwtService } from 'src/app/core/services/jwt/jwt.service';
 
 @Component({
@@ -9,7 +9,8 @@ import { JwtService } from 'src/app/core/services/jwt/jwt.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
+  subscriptions: Subscription[] = [];
   form = this.formBuilder.group({
     username: ['', Validators.required],
     password: ['', Validators.required],
@@ -27,18 +28,20 @@ export class LoginComponent {
     const username = this.form.get('username') as AbstractControl;
     const password = this.form.get('password') as AbstractControl;
     if (this.form.valid) {
-      this.jwtService
-        .getToken(username?.value, password?.value)
-        .pipe(
-          tap(
-            (res) => res.error && this.inputsAreInvalid([username, password])
-          ),
-          filter((res) => !res.error)
-        )
-        .subscribe((token) => {
-          this.jwtService.setToken(token);
-          this.router.navigate(['list']);
-        });
+      this.subscriptions.push(
+        this.jwtService
+          .getToken(username?.value, password?.value)
+          .pipe(
+            tap(
+              (res) => res.error && this.inputsAreInvalid([username, password])
+            ),
+            filter((res) => !res.error)
+          )
+          .subscribe((token) => {
+            this.jwtService.setToken(token);
+            this.router.navigate(['list']);
+          })
+      );
     } else {
       this.inputsMarkAsDirty([username, password]);
     }
@@ -60,5 +63,9 @@ export class LoginComponent {
   hasError(formControlName: string, error: string): boolean {
     const control = this.form.get(formControlName) as AbstractControl;
     return control?.hasError(error) && control?.dirty;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CharactersService } from 'src/app/core/services/characrers/characters.service';
 
 @Component({
@@ -8,7 +9,8 @@ import { CharactersService } from 'src/app/core/services/characrers/characters.s
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
 })
-export class ListComponent implements OnInit {
+export class ListComponent implements OnInit, OnDestroy {
+  subscriptions: Subscription[] = [];
   characters = [];
   first = 0;
   rows = 10;
@@ -41,9 +43,11 @@ export class ListComponent implements OnInit {
   }
 
   initFormFilter() {
-    this.form.valueChanges.subscribe(() => {
-      this.getCharacters();
-    });
+    this.subscriptions.push(
+      this.form.valueChanges.subscribe(() => {
+        this.getCharacters();
+      })
+    );
   }
 
   getCharacters() {
@@ -56,16 +60,18 @@ export class ListComponent implements OnInit {
       )
     );
     if (!sessionStorageData) {
-      this.charactersService
-        .getCharacters(
-          this.first.toString(),
-          this.rows.toString(),
-          this.getControlValue('gender'),
-          this.getControlValue('isAlive')
-        )
-        .subscribe((res: any) => {
-          this.characters = res;
-        });
+      this.subscriptions.push(
+        this.charactersService
+          .getCharacters(
+            this.first.toString(),
+            this.rows.toString(),
+            this.getControlValue('gender'),
+            this.getControlValue('isAlive')
+          )
+          .subscribe((res: any) => {
+            this.characters = res;
+          })
+      );
     } else {
       this.characters = JSON.parse(sessionStorageData);
     }
@@ -90,5 +96,9 @@ export class ListComponent implements OnInit {
   logout() {
     sessionStorage.clear();
     this.router.navigate(['/login']);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }
