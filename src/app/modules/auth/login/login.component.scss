@@ -1,0 +1,33 @@
+:host {
+  main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    form {
+      box-shadow: 0px 2px 4px rgb(0 0 0 / 15%);
+      border-radius: 20px;
+      background-color: #f3f3f3;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      button {
+        margin-top: 15px;
+      }
+      .input-container {
+        padding: 15px 0;
+        .p-error {
+          position: absolute;
+          bottom: -17px;
+          left: 12px;
+        }
+      }
+      .p-error.invalid {
+        position: absolute;
+        bottom: 30px;
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+:host {
+  .logout {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: pointer;
+  }
+  form {
+    margin-bottom: 30px;
+    .filter-content {
+      display: flex;
+      align-items: center;
+      p {
+        margin-right: 10px;
+      }
+    }
+  }
+  i {
+    margin-right: 5px;
+  }
+  .pagination {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

@@ -1,0 +1,38 @@
+<main>
+  <form [formGroup]="form" (submit)="login()">
+    <div class="input-container">
+      <span class="p-float-label">
+        <input
+          id="username-input"
+          type="text"
+          pInputText
+          [formControlName]="'username'"
+        />
+        <label for="username-input">Username</label>
+        <small *ngIf="hasError('username', 'required')" class="p-error"
+          >Username is required</small
+        >
+      </span>
+    </div>
+    <div class="input-container">
+      <span class="p-float-label">
+        <input
+          id="password-input"
+          type="password"
+          pInputText
+          [formControlName]="'password'"
+        />
+        <label for="password-input">Password</label>
+        <small *ngIf="hasError('password', 'required')" class="p-error"
+          >Password is required</small
+        >
+      </span>
+    </div>
+    <button pButton type="submit" label="Send"></button>
+    <small
+      *ngIf="hasError('username', 'invalid') || hasError('password', 'invalid')"
+      class="p-error invalid"
+      >Username or password is invalid</small
+    >
+  </form>
+</main>
